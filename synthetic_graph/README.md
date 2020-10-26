@@ -7,6 +7,21 @@
 
 ## Parameters
 
+- `DESIRED_PROPERTY` is the subgraph property to be predicted (i.e. density, cut ratio, component, coreness)
+- `BASE_GRAPH_TYPE` is the type of base graph to use (i.e. barabasi albert, duplication divergence graph)
+- `SUBGRAPH_TYPE` is the method used to add subgraphs (i.e. bfs, staple, plant)
+- `N_SUBGRAPHS` is the number of subgraphs to create
+- `N_CONNECTED_COMPONENTS` is the number of connected components per subgraph
+- `N_SUBGRAPH_NODES` is the number of nodes in each subgraph
+- `FEATURES_TYPE` is the node features (i.e. one-hot)
+- `N` is the number of nodes in the base graph
+- `P` is the probability of adding an edge between existing nodes (i.e. extended barabasi albert graph) (p + q < 1)
+- `Q` is the probability of rewiring existing edges (i.e. extended barabasi albert graph) (p + q < 1)
+- `M` is the number of edges to attach from a new node to existing nodes (used for barabasi albert graph)
+- `N_BINS` is the number of bins for subgraph values (labels)
+- `SUBGRAPH_GENERATOR` is the type of graph to use as subgraphs (i.e. complete, extended barabasi albert, duplication divergence graph)
+- `MODIFY_GRAPH_FOR_PROPERTIES` is the flag for whether or not to modify graphs in order to achieve the desired property 
+
 The following examples are the parameters used to create the synthetic graphs described in the SubGNN paper.
 
 ### Density
@@ -20,7 +35,7 @@ The following examples are the parameters used to create the synthetic graphs de
         FEATURES_TYPE = 'one_hot'
         N = 5000
         P = 0.5 # default
-        Q = 0 # not used (Q = 1 - P)
+        Q = 0 # not used
         M = 5 # default
         N_BINS = 3 # not used
         SUBGRAPH_GENERATOR = 'complete'
@@ -37,7 +52,7 @@ The following examples are the parameters used to create the synthetic graphs de
         FEATURES_TYPE='one_hot'
         N = 5000
         P = 0.5 # default
-        Q = 0 # not used (Q = 1 - P)
+        Q = 0 # not used
         M = 5 # default
         N_BINS = 3 # not used
         SUBGRAPH_GENERATOR = 'complete' 

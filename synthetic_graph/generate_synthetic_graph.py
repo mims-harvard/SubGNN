@@ -36,6 +36,13 @@ class SyntheticGraph():
 
 
     def generate_base_graph(self, **kwargs):
+        """
+        Generate the base graph.
+
+        Return
+            - G (networkx object): base graph
+        """
+
         if self.base_graph_type == 'barabasi_albert':
             m = kwargs.get('m', 5)
             n = kwargs.get('n', 500)
@@ -49,6 +56,13 @@ class SyntheticGraph():
         return G
     
     def initialize_features(self, **kwargs):
+        """
+        Initialize node features in base graph.
+
+        Return
+            - Numpy matrix
+        """
+
         n_nodes = len(self.graph.nodes)
         if self.features_type == 'one_hot':
             return np.eye(n_nodes, dtype=int)
@@ -59,6 +73,13 @@ class SyntheticGraph():
             raise Exception('The feature initialization you specified is not implemented')
 
     def generate_and_add_subgraphs(self, **kwargs):
+        """
+        Generate and add subgraphs to the base graph.
+
+        Return
+            - subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
+
         n_subgraphs = kwargs.pop('n_subgraphs', 3)
         n_nodes_in_subgraph = kwargs.pop('n_subgraph_nodes', 5)
         n_connected_components = kwargs.pop('n_connected_components', 1)
@@ -70,10 +91,7 @@ class SyntheticGraph():
         elif self.subgraph_type == 'bfs':
             subgraphs =  self._get_subgraphs_by_bfs(n_subgraphs, n_nodes_in_subgraph, n_connected_components, **kwargs)
         elif self.subgraph_type == 'staple':
-            if desired_property == None:
-                subgraphs = self._get_subgraphs_by_stapling(n_subgraphs, n_nodes_in_subgraph, n_connected_components, **kwargs)
-            elif desired_property == 'cc':
-                subgraphs = self._get_subgraphs_by_k_hops(n_subgraphs, n_nodes_in_subgraph, n_connected_components, **kwargs)
+            subgraphs = self._get_subgraphs_by_k_hops(n_subgraphs, n_nodes_in_subgraph, n_connected_components, **kwargs)
         elif self.subgraph_type == 'plant':
             if desired_property == 'coreness':
                 subgraphs = self._get_subgraphs_by_coreness(n_subgraphs, n_nodes_in_subgraph, n_connected_components, **kwargs)
@@ -88,23 +106,36 @@ class SyntheticGraph():
         return subgraphs
 
     def _get_subgraphs_randomly(self, n_subgraphs, n_nodes_in_subgraph, **kwargs):
-        '''
+        """
         Randomly generates subgraphs of size n_nodes_in_subgraph
+
         Args
-            - G (tensor): matrix of nodes and features
+            - n_subgraphs (int): number of subgraphs
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
 
         Return
-            - subgraphs (list): list of nodes belonging to each subgraph
-        '''
+            - subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
 
         subgraphs = []
         for s in range(n_subgraphs):
             sampled_nodes = random.sample(self.graph.nodes, n_nodes_in_subgraph)
             subgraphs.append(sampled_nodes)
-
         return subgraphs
 
-    def staple_component_to_graph(self, n_nodes_in_subgraph, graph_root_node, p, **kwargs):
+    def staple_component_to_graph(self, n_nodes_in_subgraph, graph_root_node, **kwargs):
+        """
+        Staple a connected component to a graph.
+
+        Args
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
+            - graph_root_node (int): node in the base graph that the component should be "stapled" to
+
+        Return
+            - cc_node_ids (list): nodes in a connected component
+            - cc_root_node (int): node in the connected component (subgraph) to connect with the graph_root_node
+        """
+        
         # Create new connected component for the node in base graph
         con_component = self.generate_subgraph(n_nodes_in_subgraph, **kwargs)
 
@@ -119,11 +150,19 @@ class SyntheticGraph():
         return cc_node_ids, cc_root_node
     
     def _get_subgraphs_by_k_hops(self, n_subgraphs, n_nodes_in_subgraph, n_connected_components, **kwargs):
-        '''
-        Generates n subgraphs that are k hops apart, staples each subgraph to the base graph by adding edge between random node
-        from the subgraph & random node from the base graph
+        """
+        Generate subgraphs that are k hops apart, staple each subgraph to the base graph by adding edge between a random node
+        from the subgraph and a random node from the base graph
+
+        Args
+            - n_subgraphs (int): number of subgraphs
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
+            - n_connected_components (int): number of connected components in each subgraph
         
-        '''
+        Return
+            - validated_subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
+
         diameter = nx.diameter(self.graph)
         k_hops_range = [int(diameter * k) for k in config.K_HOPS_RANGE]
         p_range = [float(p) for p in config.BA_P_RANGE]
@@ -182,10 +221,20 @@ class SyntheticGraph():
         return validated_subgraphs
 
     def _get_subgraphs_by_coreness(self, n_subgraphs, n_nodes_in_subgraph, n_connected_components, remove_edges=False, **kwargs):
-        '''
-        Sample nodes from base graph that have at least n nodes with k core. Merge the edges from the generated
+        """
+        Sample nodes from the base graph that have at least n nodes with k core. Merge the edges from the generated
         subgraph with the edges from the base graph. Optionally, remove all other edges in the subgraphs
-        '''
+
+        Args
+            - n_subgraphs (int): number of subgraphs
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
+            - n_connected_components (int): number of connected components in each subgraph
+            - remove_edges (bool): true if should remove unmerged edges in subgraphs, false otherwise
+        
+        Return
+            - subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
+
         subgraphs = []
 
         k_core_dict = nx.core_number(self.graph)        
@@ -209,7 +258,6 @@ class SyntheticGraph():
                 for c in range(n_connected_components):
                     if len(nodes_with_k_cores) < n_nodes_in_subgraph: break
 
-                    #con_component = self.generate_subgraph(n_nodes_in_subgraph, None, **kwargs)
                     con_component = self.generate_subgraph(n_nodes_in_subgraph, **kwargs)
                     cc_node_ids = random.sample(nodes_with_k_cores, n_nodes_in_subgraph)
 
@@ -233,8 +281,19 @@ class SyntheticGraph():
 
         return subgraphs
 
-    def _get_subgraphs_by_bfs(self, n_subgraphs, n_nodes_in_subgraph, 
-        n_connected_components,  **kwargs):
+    def _get_subgraphs_by_bfs(self, n_subgraphs, n_nodes_in_subgraph, n_connected_components,  **kwargs):
+        """
+        Sample n_connected_components number of start nodes from the base graph. Perform BFS to create subgraphs
+        of size n_nodes_in_subgraph.
+
+        Args
+            - n_subgraphs (int): number of subgraphs
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
+            - n_connected_components (int): number of connected components in each subgraph
+        
+        Return
+            - subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
 
         max_depth = kwargs.pop('max_depth', 3)
 
@@ -264,6 +323,15 @@ class SyntheticGraph():
         return subgraphs
 
     def generate_subgraph(self, n_nodes_in_subgraph, **kwargs):
+        """
+        Generate a subgraph with specified properties.
+
+        Args
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
+        
+        Return
+            - G (networkx object): subgraph
+        """
         
         subgraph_generator = kwargs.pop('subgraph_generator', 'path')
 
@@ -293,9 +361,18 @@ class SyntheticGraph():
         return G
 
     def is_k_hops_away(self, start, end, n_hops):
-        '''
-        returns true if the start node is k hops away from the end node
-        '''
+        """
+        Check whether the start node is k hops away from the end node.
+
+        Args
+            - start (int): start node
+            - end (int): end node
+            - n_hops (int): k hops
+        
+        Return
+            - True if the start node is k hops away from the end node, false otherwise
+        """
+
         shortest_path_lengh = nx.shortest_path_length(self.graph, start, end)
         if shortest_path_lengh == n_hops:
             return True
@@ -303,20 +380,37 @@ class SyntheticGraph():
             return False
 
     def is_k_hops_from_all_cc(self, cand, all_cc_start_nodes, k_hops):
-        '''
-        return True if the candidate node is k hops away from all CC start nodes
-        '''
+        """
+        Check whether the candidate node is k hops away from all CC start nodes.
+
+        Args
+            - cand (int): candidate node
+            - all_cc_start_nodes (list): cc start nodes
+            - k_hops (int): k hops
+        
+        Return
+            - True if the candidate node is k hops away from all CC start nodes, false otherwise
+        """
+
         for cc_start in all_cc_start_nodes:
             if not self.is_k_hops_away(cc_start, cand, k_hops):
                 return False
         return True
 
     def _get_subgraphs_by_stapling(self, n_subgraphs, n_nodes_in_subgraph, n_connected_components, **kwargs):
-        '''
-        Generates n subgraphs, staples each subgraph to the base graph by adding edge between random node
-        from the subgraph & random node from the base graph
+        """
+        Generate n subgraphs, staple each subgraph to the base graph by adding an edge between random node
+        from the subgraph and a random node from the base graph.
+
+        Args
+            - n_subgraphs (int): number of subgraphs
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
+            - n_connected_components (int): number of connected components in each subgraph
         
-        '''
+        Return
+            - subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
+
         k_core_to_sample = kwargs.pop('k_core_to_sample', -1)
         k_hops = kwargs.pop('k_hops', -1)
 
@@ -369,12 +463,21 @@ class SyntheticGraph():
         return subgraphs
 
     def _get_subgraphs_by_planting(self, n_subgraphs, n_nodes_in_subgraph, n_connected_components, remove_edges=False, **kwargs):
-        '''
+        """
         Randomly sample nodes from base graph that will be in each subgraph. Merge the edges from the generated
         subgraph with the edges from the base graph. Optionally, remove all other edges in the subgraphs
-        '''
-        k_core_to_sample = kwargs.pop('k_core_to_sample', -1)
 
+        Args
+            - n_subgraphs (int): number of subgraphs
+            - n_nodes_in_subgraph (int): number of nodes in each subgraph
+            - n_connected_components (int): number of connected components in each subgraph
+            - remove_edges (bool): true if should remove unmerged edges in subgraphs, false otherwise
+        
+        Return
+            - subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
+        
+        k_core_to_sample = kwargs.pop('k_core_to_sample', -1)
 
         subgraphs = []
         for s in range(n_subgraphs):
@@ -410,24 +513,46 @@ class SyntheticGraph():
 
 
     def _get_property(self, subgraph, subgraph_property):
-        if subgraph_property == 'density': #internal structure 
+        """
+        Compute the value of a specified property.
+
+        Args
+            - subgraph (networkx object): subgraph
+            - subgraph_property (str): desired property of subgraph
+        
+        Return
+            - Value of subgraph
+        """
+
+        if subgraph_property == 'density':
             return nx.density(subgraph) 
-        elif subgraph_property == 'cut_ratio': #border structure
+
+        elif subgraph_property == 'cut_ratio':
             nodes_except_subgraph = set(self.graph.nodes).difference(set(subgraph.nodes))
             n_boundary_edges = len(list(nx.edge_boundary(self.graph, subgraph.nodes, nodes_except_subgraph)))
             n_nodes = len(list(self.graph.nodes))
             n_sugraph_nodes = len(list(subgraph.nodes))
             return n_boundary_edges / (n_sugraph_nodes * (n_nodes - n_sugraph_nodes))
-        elif subgraph_property == 'coreness': # external position
+
+        elif subgraph_property == 'coreness': 
             all_cores = nx.core_number(subgraph)            
             avg_coreness = np.average(list(all_cores.values()))
             return avg_coreness
+
         elif subgraph_property == 'cc':
             return nx.number_connected_components(self.graph.subgraph(subgraph))
+
         else:
             raise Exception('The subgraph property you specificed is not implemented.')
 
     def _modify_graph_for_desired_subgraph_properties(self, subgraphs, **kwargs):
+        """
+        Modify the graph to achieve the desired subgraph property.
+
+        Args
+            - subgraphs (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        """
+        
         desired_property = kwargs.get('desired_property', 'density')
 
         # Iterate through subgraphs
@@ -495,6 +620,12 @@ class SyntheticGraph():
          
                     
     def generate_subgraph_labels(self, **kwargs):
+        """
+        Generate subgraph labels
+
+        Return
+            - labels (list): subgraph labels
+        """
 
         # Make sure base graph is connected
         if nx.is_connected(self.graph) == False:
@@ -533,12 +664,14 @@ class SyntheticGraph():
             labels = self.convert_number_to_chr(labels)
             print(Counter(labels))
             return labels
+
         elif desired_property == 'cut_ratio': 
             bins = self.generate_bins(sorted(cut_ratios), len(config.CUT_RATIO_RANGE))
             labels = np.digitize(cut_ratios, bins = bins)
             labels = self.convert_number_to_chr(labels)
             print(Counter(labels))
             return labels
+
         elif desired_property == 'coreness': 
             n_bins = kwargs.pop('n_bins', 5)
             bins = self.generate_bins(sorted(coreness), n_bins)
@@ -546,6 +679,7 @@ class SyntheticGraph():
             labels = self.convert_number_to_chr(labels)
             print(Counter(labels))
             return labels
+
         elif desired_property == 'cc':
             print(Counter(cc))
             bins = [1, 5] # 1 CC vs. >1 CC
@@ -554,9 +688,22 @@ class SyntheticGraph():
             print(Counter(labels))
             assert len(list(Counter(labels).keys())) == len(bins)
             return labels
-        else: raise Exception('Other properties have not yet been implemented')
+
+        else: 
+            raise Exception('Other properties have not yet been implemented')
 
     def generate_bins(self, values, n_bins):
+        """
+        Generate bins for given subgraph values.
+
+        Args
+            - values (list): values for each subgraph
+            - n_bins (int): number of pins to split the subgraph values into
+
+        Return
+            - bins (list): cutoffs values for each bin
+        """
+
         bins = (len(values) / float(n_bins)) * np.arange(1, n_bins + 1)
         bins = np.unique(np.array([values[int(b) - 1] for b in bins]))
         bins = np.delete(bins, len(bins) - 1)
@@ -564,6 +711,16 @@ class SyntheticGraph():
         return bins
 
     def convert_number_to_chr(self, labels):
+        """
+        Convert label bins from int to str.
+
+        Args
+            - labels (list): subgraph labels
+
+        Return
+            - new_labels (list): converted subgraph labels as strings
+        """
+
         types = {}
         alpha_int = 65 # A
         
@@ -580,6 +737,16 @@ class SyntheticGraph():
 
 
 def generate_mask(n_subgraphs):
+    """
+    Generate train/val/test masks for the subgraphs.
+
+    Args
+        - n_subgraphs (int): number of subgraphs
+
+    Return
+        - mask (list): 0 if subgraph is in train set, 1 if in val set, 2 if in test set
+    """
+    
     idx = set(range(n_subgraphs))
     train_mask = list(random.sample(idx, int(len(idx) * 0.8))) 
     idx = idx.difference(set(train_mask)) 
@@ -595,6 +762,17 @@ def generate_mask(n_subgraphs):
 
 
 def write_f(sub_f, sub_G, sub_G_label, mask):
+    """
+    Write subgraph information into the appropriate format for SubGNN (tab-delimited file where each row
+    has dash-delimited nodes, subgraph label, and train/val/test label).
+
+    Args
+        - sub_f (str): file directory to save subgraph information
+        - sub_G (list of lists): list of subgraphs, where each subgraph is a list of nodes
+        - sub_G_label (list): subgraph labels
+        - mask (list): 0 if subgraph is in train set, 1 if in val set, 2 if in test set
+    """
+
     with open(sub_f, "w") as fout:
         for g, l, m in zip(sub_G, sub_G_label, mask):
             g = [str(val) for val in g]
