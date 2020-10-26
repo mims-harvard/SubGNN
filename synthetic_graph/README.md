@@ -2,7 +2,7 @@
 
 ## Instructions
 
-1. Modify the `config.py` file in the current directory (`./SubGNN/synthetic_graph`)
+1. Modify the `synthetic_graph_config.py` file in the current directory (`./SubGNN/synthetic_graph`)
 2. Run `python generate_synthetic_graph.py` 
 
 ## Parameters

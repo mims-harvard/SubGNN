@@ -7,7 +7,7 @@ import logging
 from collections import Counter, defaultdict
 import sys
 sys.path.insert(0, '../') # add config to path
-import config
+import synthetic_graph_config as config
 
 # Pytorch
 import torch
