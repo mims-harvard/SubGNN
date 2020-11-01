@@ -1,5 +1,5 @@
 # SubGNN
-Repository for NeurIPS 2020 paper: Subgraph Neural Networks
+Repository for NeurIPS 2020 paper: [Subgraph Neural Networks](https://arxiv.org/abs/2006.10538)
 
 ## Install the Environment
 We provide a yml file containing the necessary packages for SubGNN. Once you have [conda](https://docs.anaconda.com/anaconda/install/) installed, you can create an environment as follows:
