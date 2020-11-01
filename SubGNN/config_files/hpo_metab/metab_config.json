@@ -1,0 +1,127 @@
+{
+    "data": {
+        "task":"hpo_metab"
+    },
+    //"no_gpu":true, //add this line to use CPU
+
+    "tb": {
+        "tb_logging":true,
+        "dir" : "tensorboard",
+        "name": "S_metab_optuna"
+       
+    },
+    "optuna":{
+        "opt_n_trials" : 50,
+        "opt_n_cores" : 1,
+        "monitor_metric" : "val_micro_f1",
+        "opt_direction" : "maximize" ,
+        "sampler" : "random", 
+        "pruning" : false
+    },
+
+    "hyperparams_fix" : {
+        "max_epochs": 300,
+        "use_neighborhood": false, 
+        "use_structure": true,
+        "use_position": false,
+        "seed": 3,
+        "node_embed_size": 32,
+        "structure_patch_type": "triangular_random_walk",
+        "lstm_aggregator": "last",
+        "n_processes": 20,
+        "resample_anchor_patches": false,
+        "freeze_node_embeds":false,
+        "use_mpn_projection":true,
+        "print_train_times":false,
+        "compute_similarities":false,
+        "sample_walk_len":50,
+        "n_triangular_walks": 5, 
+        "random_walk_len":10,  
+        "rw_beta" : 0.65,
+        "ff_attn": false,
+        "max_sim_epochs": 5,
+        "embedding_type": "gin"    
+    
+    },
+
+    "hyperparams_optuna": {
+        "batch_size" :{
+            "type" : "suggest_categorical",
+            "args" : [[ 64, 128] ]
+        },
+        "learning_rate" :{
+            "type" : "suggest_float",
+            "args" : [1e-4, 1e-3],
+            "kwargs" : {"log":true}
+        },
+        "grad_clip" : {
+            "type" : "suggest_float",
+            "args" : [0.0, 0.5]
+        },
+        "n_layers": {
+            "type" : "suggest_int",
+            "args" : [1,5]
+        },
+        "neigh_sample_border_size" : {
+            "type" : "suggest_int",
+            "args" : [1,2]
+        },
+        "n_anchor_patches_pos_out": {
+            "type" : "suggest_int",
+            "args" : [50,200]
+        }, 
+        "n_anchor_patches_pos_in": {
+            "type" : "suggest_int",
+            "args" : [25,75]
+        },
+        "n_anchor_patches_N_in": {
+            "type" : "suggest_int",
+            "args" : [10,25]
+        }, 
+        "n_anchor_patches_N_out": {
+            "type" : "suggest_int",
+            "args" : [25,75]
+        }, 
+        "n_anchor_patches_structure": {
+            "type" : "suggest_int",
+            "args" : [15,45]
+        }, 
+        "gamma_shortest_max_distance_P" : {
+            "type" : "suggest_int",
+            "args" : [3,6]
+        },
+        "linear_hidden_dim_1" : {
+            "type" : "suggest_categorical",
+            "args" : [[64]]
+        },
+        "linear_hidden_dim_2" : {
+            "type" : "suggest_categorical",
+            "args" : [[32, 64]]
+        },
+        "lstm_dropout" : {
+            "type" : "suggest_float",
+            "args" : [0.0, 0.4]
+        },
+        "lstm_n_layers" : {
+            "type" : "suggest_int",
+            "args" : [1,2]
+        },
+        "lin_dropout" : {
+            "type" : "suggest_float",
+            "args" : [0.0, 0.4]
+        },
+        "cc_aggregator":{
+            "type" : "suggest_categorical",
+            "args" : [[ "sum","max"] ]
+        },
+        "trainable_cc":{
+            "type" : "suggest_categorical",
+            "args" : [[ true,false] ]
+        },
+        "auto_lr_find":{
+            "type" : "suggest_categorical",
+            "args" : [[ true,false] ]
+        }
+    }
+
+}
