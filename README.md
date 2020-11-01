@@ -6,6 +6,8 @@ We provide a yml file containing the necessary packages for SubGNN. Once you hav
 ```
 conda env create --file SubGNN.yml 
 ```
+## Datasets
+We are releasing four new real-world datasets: HPO-NEURO, HPO-METAB, PPI-BP, and EM-USER. You can download these files from dropbox [here](https://www.dropbox.com/sh/zv7gw2bqzqev9yn/AACR9iR4Ok7f9x1fIAiVCdj3a?dl=0). You should unzip the folder and set the project directory below to the path where you downloaded the data (e.g. `/PATH/TO/SubGNN_data`) We also provide a script to generate the DENSITY, CORENESS, COMPONENT, and CUTRATIO synthetic graphs featured in our paper. See the README in the synthetic graphs folder for more information on how to generate these synthetic datasets.
 
 ## How to Train
 To train SubGNN, you should first specify your project directory in `config.py`. This directory should include folders containing all datasets and will contain all tensorboard folders with model outputs. Then modify the config.json file for the appropriate dataset to set the tensorboard output directory and the hyperparameter search ranges, including which SubGNN channels (neighborhood, structure, or position) to turn on. Finally, train the model via the following: 
