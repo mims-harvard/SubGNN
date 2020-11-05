@@ -136,7 +136,6 @@ def get_hyperparams(args):
         "n_anchor_patches_N_in": 19,
         "n_anchor_patches_N_out": 69,
         "n_anchor_patches_structure": 37,
-        "gamma_shortest_max_distance_P": 5,
         "linear_hidden_dim_1": 64,
         "linear_hidden_dim_2": 32,
         "lstm_dropout": 0.21923625197416907,
@@ -167,7 +166,6 @@ def get_hyperparams_optuma(args, trial):
             'n_anchor_patches_N_out': trial.suggest_int('n_anchor_patches_N_out', 25, 75),  # number of anchor patches (N, BORDER)
             'n_anchor_patches_structure': trial.suggest_int('n_anchor_patches_structure', 15, 40),  # number of anchor patches (S, INTERNAL & BORDER)
             'neigh_sample_border_size': trial.suggest_int('neigh_sample_border_size', 1,2), 
-            'gamma_shortest_max_distance_P': trial.suggest_int('gamma_shortest_max_distance_P', 3,5),
             'linear_hidden_dim_1': trial.suggest_int('linear_hidden_dim', 16, 96), 
             'linear_hidden_dim_2': trial.suggest_int('linear_hidden_dim', 16, 96), 
             'n_triangular_walks': trial.suggest_int('n_triangular_walks', 5, 15), 
