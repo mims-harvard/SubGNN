@@ -37,7 +37,7 @@ Specify settings for the optuna study
 
 ### `hyperparams_fix` and `hyperparams_optuna`
 
-`hyperparams_fix` specifies the fixed hyperparameters, and `hyperparams_optuna` specifies which hyperparameters to search over. 
+Note that `hyperparams_fix` specifies the fixed hyperparameters, and `hyperparams_optuna` specifies which hyperparameters to search over. 
 
 `compute_similarities`: boolean specifying whether to recompute similarity calculations, even if they've already been precomputed and saved to a file
 
@@ -78,6 +78,44 @@ Specify settings for the optuna study
 `rw_beta`: triangular random walk beta parameter determines whether triangles or non-triangles will be privi-leged during sampling
 
 `max_sim_epochs`: integer that controls how many structure patches are initially sampled during precomputing. We default to 5. This parameter is only important if `resample_anchor_patches` is true. 
+
+`batch_size`: batch size used during training
+
+`learning_rate`: float specifying the learning rate
+
+`grad_clip`: float specifying the gradient clipping
+
+`n_layers`: number of layers in SubGNN
+
+`neigh_sample_border_size`: integer specifying the distance from the subgraph from which border neighborhood anchor patches can be sampled (i.e. `k` that specifies the k-kop neighborhood of the subgraph component)
+
+`n_anchor_patches_pos_out`: number of border position anchor patches
+
+`n_anchor_patches_pos_in`: number of internal position anchor patches
+
+`n_anchor_patches_N_in`: number of internal neighborhood anchor patches
+
+`n_anchor_patches_N_out`: number of border neighborhood anchor patches
+
+`n_anchor_patches_structure`: number of structure anchor patches
+              
+`linear_hidden_dim_1`: integer specifying the hidden dimension of the first feed forward layer
+
+`linear_hidden_dim_2`: integer specifying the hidden dimension of the second feed forward layer
+
+`lin_dropout`: float specifying the dropout in the linear layers
+
+`lstm_n_layers`: number of LSTM layers (used to embed structure anchor patches)
+
+`lstm_dropout`: float specifying LSTM dropout     
+
+`cc_aggregator`: approach for aggregating node embeddings to initialize the component embedding (either `sum` or `max`)
+
+`trainable_cc`: boolean specifying whether the component embeddings are trainable or fixed
+
+`auto_lr_find`: boolean specifying whether or not to use Pytorch Lightning's learning rate finder
+       
+
 
 
 
