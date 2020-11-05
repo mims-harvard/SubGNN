@@ -86,10 +86,6 @@
             "type" : "suggest_int",
             "args" : [15,45]
         }, 
-        "gamma_shortest_max_distance_P" : {
-            "type" : "suggest_int",
-            "args" : [3,6]
-        },
         "linear_hidden_dim_1" : {
             "type" : "suggest_categorical",
             "args" : [[64]]
