@@ -24,6 +24,9 @@ python train_config.py -config_path config_files/hpo_metab/metab_config.json
 The model and asssociated hyperparameters will be saved in the tensorboard directory specified by `tb_dir` and `tb_name` in the config file. We use the `hpo_metab` dataset as as example, but you can easily run any of the datasets by passing in the appropriate config file. Note that, while you can also train the model via `train.py`, we highly recommend using `train_config.py` instead.
 
 ## How to Evaluate
+
+### Re-train & test on 10 random seeds
+
 Once you have trained SubGNN and selected the best hyperparameters on the validaation set, run the `test.py` script to re-train the model on 10 random seeds and evaluate on the test set:
 
 ```
@@ -36,6 +39,8 @@ python test.py \
 ```
 
 Note that the `restoreModelPath` directory should contain a `.ckpt` file and a `hyperparams.json` file. This command will create a tensorboard directory at `PROJECT_ROOT/tb_dir/tb_name` where `tb_dir` and `tb_name` are specified by the input parameters. The test performance on each random seed will be saved in `test_results.json` files in folders in this tensorboard directory. The `experiment_results.json` file summarizes test performance across all random seeds.
+
+### Test on single random seed
 
 You can also evaluate the model on a single random seed. You can use `train.py` with the `-noTrain` and `-runTest` flags to restore a specific model and evaluate on test data. The results will be printed to the console.
 
