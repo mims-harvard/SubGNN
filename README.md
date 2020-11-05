@@ -14,14 +14,14 @@ conda env create --file SubGNN.yml
 We are releasing four new real-world datasets: HPO-NEURO, HPO-METAB, PPI-BP, and EM-USER. You can download these files from dropbox [here](https://www.dropbox.com/sh/zv7gw2bqzqev9yn/AACR9iR4Ok7f9x1fIAiVCdj3a?dl=0). You should unzip the folder and set the project directory below to the path where you downloaded the data (e.g. `/PATH/TO/SubGNN_data`) We also provide a script to generate the DENSITY, CORENESS, COMPONENT, and CUTRATIO synthetic graphs featured in our paper. See the README in the synthetic graphs folder for more information on how to generate these synthetic datasets.
 
 ## How to Train
-To train SubGNN, you should first specify your project directory via `PROJECT_ROOT` in `config.py`. This directory should include folders containing all datasets and will contain all tensorboard folders with model outputs. Then modify the config.json file for the appropriate dataset to set the tensorboard output directory and the hyperparameter search ranges, including which SubGNN channels (neighborhood, structure, or position) to turn on. Finally, train the model via the following: 
+To train SubGNN, you should first specify your project directory via `PROJECT_ROOT` in `config.py`. This directory should include folders containing all datasets and will ultimately contain all tensorboard folders with model outputs. Then modify the config.json file for the appropriate dataset to set the tensorboard output directory and the hyperparameter search ranges, including which SubGNN channels (neighborhood, structure, or position) to turn on.  To learn more about the hyperparameters, go to the `README` in the config_files folder. Finally, train the model via the following: 
 
 ```
 cd SubGNN
 python train_config.py -config_path config_files/hpo_metab/metab_config.json
 ```
 
-The model and asssociated hyperparameters will be saved in the tensorboard directory specified by `tb_dir` and `tb_name` in the config file. We use the `hpo_metab` dataset as as example, but you can easily run any of the datasets by passing in the appropriate config file. To learn more about the hyperparameters, go to the `README` in the config_files folder. Note that, while you can also train the model via `train.py`, we highly recommend using `train_config.py` instead.
+The model and asssociated hyperparameters will be saved in the tensorboard directory specified by `tb_dir` and `tb_name` in the config file. We use the `hpo_metab` dataset as as example, but you can easily run any of the datasets by passing in the appropriate config file. Note that, while you can also train the model via `train.py`, we highly recommend using `train_config.py` instead.
 
 ## How to Evaluate
 Once you have trained SubGNN and selected the best hyperparameters on the validaation set, run the `test.py` script to re-train the model on 10 random seeds and evaluate on the test set:
@@ -36,6 +36,19 @@ python test.py \
 ```
 
 Note that the `restoreModelPath` directory should contain a `.ckpt` file and a `hyperparams.json` file. This command will create a tensorboard directory at `PROJECT_ROOT/tb_dir/tb_name` where `tb_dir` and `tb_name` are specified by the input parameters. The test performance on each random seed will be saved in `test_results.json` files in folders in this tensorboard directory. The `experiment_results.json` file summarizes test performance across all random seeds.
+
+You can also evaluate the model on a single random seed. You can use `train.py` with the `-noTrain` and `-runTest` flags to restore a specific model and evaluate on test data. The results will be printed to the console.
+
+```
+cd SubGNN
+python train.py \
+-task hpo_metab \
+-noTrain \
+-runTest \
+-no_save \ 
+-restoreModelPath PATH/TO/SAVED/MODEL \ 
+-restoreModelName CHECKPOINT_FILE_NAME.ckpt
+```
 
 ## How to Cite
 ```
