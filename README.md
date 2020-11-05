@@ -21,7 +21,7 @@ cd SubGNN
 python train_config.py -config_path config_files/hpo_metab/metab_config.json
 ```
 
-The model and asssociated hyperparameters will be saved in the tensorboard directory specified by `tb_dir` and `tb_name` in the config file. We use the `hpo_metab` dataset as as example, but you can easily run any of the datasets by passing in the appropriate config file. To learn more about the hyperparameters, go to the README in the config_files folder.
+The model and asssociated hyperparameters will be saved in the tensorboard directory specified by `tb_dir` and `tb_name` in the config file. We use the `hpo_metab` dataset as as example, but you can easily run any of the datasets by passing in the appropriate config file. To learn more about the hyperparameters, go to the `README` in the config_files folder. Note that, while you can also train the model via `train.py`, we highly recommend using `train_config.py` instead.
 
 ## How to Evaluate
 Once you have trained SubGNN and selected the best hyperparameters on the validaation set, run the `test.py` script to re-train the model on 10 random seeds and evaluate on the test set:
