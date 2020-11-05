@@ -4,13 +4,13 @@ Below we outline all of the hyperparameters that can be set in the config files.
 
 ### `data`
 
-Specify the dataset.
+**Specify the dataset.**
 
 `task`: which dataset to use (note that this should be the name of the folder in which the base graph edge list, subgraph labels, etc. live)
 
 ### `tb`
 
-Specify tensorboard logging.
+**Specify tensorboard logging.**
 
 `tb_logging`: boolean designating whether or not to log to a tensorboard directory. We highly recommend setting this to true.
 
@@ -20,7 +20,7 @@ Specify tensorboard logging.
 
 ### `optuna`
 
-Specify settings for the optuna study
+**Specify settings for the optuna study.**
 
 `opt_n_trials`: number of optuna trials to run (i.e. number of different hyperparameter combinations for the run type
 
@@ -37,7 +37,7 @@ Specify settings for the optuna study
 
 ### `hyperparams_fix` and `hyperparams_optuna`
 
-Note that `hyperparams_fix` specifies the fixed hyperparameters, and `hyperparams_optuna` specifies which hyperparameters to search over. 
+**Note that `hyperparams_fix` specifies the fixed hyperparameters, and `hyperparams_optuna` specifies which hyperparameters to search over.**
 
 `compute_similarities`: boolean specifying whether to recompute similarity calculations, even if they've already been precomputed and saved to a file
 
