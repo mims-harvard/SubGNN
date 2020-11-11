@@ -1,7 +1,6 @@
 from pathlib import Path
 
-PROJECT_ROOT = Path('.')
-
+# Random Seed
 RANDOM_SEED = 42
 
 # Output files

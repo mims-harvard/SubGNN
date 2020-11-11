@@ -797,7 +797,7 @@ def main():
                                      subgraph_generator = config.SUBGRAPH_GENERATOR,
                                      modify_graph_for_properties = config.MODIFY_GRAPH_FOR_PROPERTIES,
                                      desired_property = config.DESIRED_PROPERTY)
-    nx.write_edgelist(synthetic_graph.graph, config.SAVE_GRAPH) 
+    nx.write_edgelist(synthetic_graph.graph, config.SAVE_GRAPH, data=False) 
     sub_G = synthetic_graph.subgraphs
     sub_G_label = synthetic_graph.subgraph_labels
     mask = generate_mask(len(sub_G_label)) 
