@@ -3,19 +3,16 @@ from pathlib import Path
 # Random Seed
 RANDOM_SEED = 42
 
-# Output files
-SAVE_GRAPH = "example_edge_list.txt"
-SAVE_SUBGRAPHS = "example_subgraphs.pth"
-SAVE_NODE_EMB = "example_node_emb.pth"
-SAVE_NODE_EMB_LOG = "example_node_emb.log"
-SAVE_NODE_EMB_PLOTS = "example_node_emb.pdf"
-SAVE_MODEL = "example_save_model.pth"
+# Output 
+FOLDER_NAME = "./example/"
 
 # Flags
 GENERATE_SYNTHETIC_G = True
 GENERATE_NODE_EMB = True 
 
 # Parameters for generating subgraphs with specific properties
+CONV = "gin"
+MINIBATCH = "NeighborSampler"
 DESIRED_PROPERTY = "density"
 BASE_GRAPH_TYPE = "barabasi_albert"
 SUBGRAPH_TYPE = "bfs"
@@ -50,4 +47,6 @@ POSSIBLE_WD = [5e-4, 5e-5]
 POSSIBLE_DROPOUT = [0.4, 0.5]
 POSSIBLE_NB_SIZE = [1.0]
 POSSIBLE_NUM_HOPS = [1]
-EPOCHS = 100
+POSSIBLE_WALK_LENGTH = [32]
+POSSIBLE_NUM_STEPS = [32]
+EPOCHS = 1

@@ -5,7 +5,7 @@ import argparse
 import os
 import sys
 sys.path.insert(0, '../') # add config to path
-import synthetic_graph_config as config
+import config_prepare_dataset as config
 import preprocess
 import model as mdl
 import utils
@@ -14,10 +14,11 @@ import utils
 import torch
 from torch_geometric.utils.convert import to_networkx, to_scipy_sparse_matrix
 from torch_geometric.data import Data, DataLoader, NeighborSampler
+if config.MINIBATCH == "GraphSaint": from torch_geometric.data import GraphSAINTRandomWalkSampler
 from torch_geometric.utils import negative_sampling 
 
 # Global Variables
-log_f = open(config.SAVE_NODE_EMB_LOG, "w")
+log_f = open(config.FOLDER_NAME + "node_emb.log", "w")
 all_data = None 
 device = None
 best_val_acc = -1
@@ -27,10 +28,14 @@ all_losses = {}
 eps = 10e-4
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('Using device:', device)
-if device.type == 'cuda': print(torch.cuda.get_device_name(0))
-all_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES, 'hidden': config.POSSIBLE_HIDDEN, 'output': config.POSSIBLE_OUTPUT, 'lr': config.POSSIBLE_LR, 'wd': config.POSSIBLE_WD, 'nb_size': config.POSSIBLE_NB_SIZE, 'n_hops': config.POSSIBLE_NUM_HOPS, 'dropout': config.POSSIBLE_DROPOUT}
-curr_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES[0], 'hidden': config.POSSIBLE_HIDDEN[0], 'output': config.POSSIBLE_OUTPUT[0], 'lr': config.POSSIBLE_LR[0], 'wd': config.POSSIBLE_WD[0], 'nb_size': config.POSSIBLE_NB_SIZE[0], 'n_hops': config.POSSIBLE_NUM_HOPS[0], 'dropout': config.POSSIBLE_DROPOUT[0]}
 best_hyperparameters = dict()
+if device.type == 'cuda': print(torch.cuda.get_device_name(0))
+if config.MINIBATCH == "NeighborSampler":
+    all_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES, 'hidden': config.POSSIBLE_HIDDEN, 'output': config.POSSIBLE_OUTPUT, 'lr': config.POSSIBLE_LR, 'wd': config.POSSIBLE_WD, 'nb_size': config.POSSIBLE_NB_SIZE, 'n_hops': config.POSSIBLE_NUM_HOPS, 'dropout': config.POSSIBLE_DROPOUT}
+    curr_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES[0], 'hidden': config.POSSIBLE_HIDDEN[0], 'output': config.POSSIBLE_OUTPUT[0], 'lr': config.POSSIBLE_LR[0], 'wd': config.POSSIBLE_WD[0], 'nb_size': config.POSSIBLE_NB_SIZE[0], 'n_hops': config.POSSIBLE_NUM_HOPS[0], 'dropout': config.POSSIBLE_DROPOUT[0]}
+elif config.MINIBATCH == "GraphSaint":
+    all_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES, 'hidden': config.POSSIBLE_HIDDEN, 'output': config.POSSIBLE_OUTPUT, 'lr': config.POSSIBLE_LR, 'wd': config.POSSIBLE_WD, 'walk_length': config.POSSIBLE_WALK_LENGTH, 'num_steps': config.POSSIBLE_NUM_STEPS, 'dropout': config.POSSIBLE_DROPOUT}
+    curr_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES[0], 'hidden': config.POSSIBLE_HIDDEN[0], 'output': config.POSSIBLE_OUTPUT[0], 'lr': config.POSSIBLE_LR[0], 'wd': config.POSSIBLE_WD[0], 'walk_length': config.POSSIBLE_WALK_LENGTH[0], 'num_steps': config.POSSIBLE_NUM_STEPS[0], 'dropout': config.POSSIBLE_DROPOUT[0]}
 
 
 def train(epoch, model, optimizer):
@@ -45,12 +50,17 @@ def train(epoch, model, optimizer):
     acc_val = []
 
     # Minibatches
-    loader = NeighborSampler(all_data, size = curr_hyperparameters['nb_size'], num_hops = curr_hyperparameters['n_hops'], batch_size = curr_hyperparameters['batch_size'], shuffle = True, bipartite = False) 
+    if config.MINIBATCH == "NeighborSampler": 
+        loader = NeighborSampler(all_data, size = curr_hyperparameters['nb_size'], num_hops = curr_hyperparameters['n_hops'], batch_size = curr_hyperparameters['batch_size'], shuffle = True, bipartite = False) 
+        loader = loader()
+    elif config.MINIBATCH == "GraphSaint": 
+        all_data.num_classes = torch.tensor([2]) 
+        loader = GraphSAINTRandomWalkSampler(all_data, batch_size=curr_hyperparameters['batch_size'], walk_length=curr_hyperparameters['walk_length'], num_steps=curr_hyperparameters['num_steps']) 
 
     # Iterate through minibatches
-    for data in loader():
+    for data in loader:
         
-        data = preprocess.set_data(data, all_data) 
+        if config.MINIBATCH == "NeighborSampler": data = preprocess.set_data(data, all_data) 
         curr_train_pos = data.edge_index[:, data.train_mask] 
         curr_train_neg = negative_sampling(curr_train_pos, num_neg_samples=curr_train_pos.size(1) // 4) 
         curr_train_total = torch.cat([curr_train_pos, curr_train_neg], dim=-1) 
@@ -94,7 +104,7 @@ def train(epoch, model, optimizer):
     # Save best model and parameters
     if best_val_acc <= np.mean(acc_val) + eps:
         best_val_acc = np.mean(acc_val)
-        with open(config.SAVE_MODEL, 'wb') as f:
+        with open(config.FOLDER_NAME + "best_model.pth", 'wb') as f:
             torch.save(model.state_dict(), f)
         best_hyperparameters = curr_hyperparameters
         best_model = model
@@ -106,7 +116,7 @@ def test(model):
 
     global all_data, best_embeddings, best_hyperparameters, all_losses
 
-    model.load_state_dict(torch.load(config.SAVE_MODEL))
+    model.load_state_dict(torch.load(config.FOLDER_NAME + "best_model.pth"))
     model.to(device)
     model.eval()
 
@@ -118,7 +128,7 @@ def test(model):
     test_neg_edges = (test_pos_edges == 0)
 
     dot_embed = utils.el_dot(best_embeddings, test_total, test = True)
-    roc_score, ap_score, test_acc, test_f1 = utils.calc_roc_score(pred_all = dot_embed, pos_edges = test_pos_edges.flatten(), neg_edges = test_neg_edges.flatten(), loss = all_losses, save_plots = config.SAVE_NODE_EMB_PLOTS)
+    roc_score, ap_score, test_acc, test_f1 = utils.calc_roc_score(pred_all = dot_embed, pos_edges = test_pos_edges.flatten(), neg_edges = test_neg_edges.flatten(), loss = all_losses, save_plots = config.FOLDER_NAME + "train_plots.pdf")
     print('Test ROC score: {:.5f}'.format(roc_score))
     print('Test AP score: {:.5f}'.format(ap_score))
     print('Test Accuracy: {:.5f}'.format(test_acc))
@@ -133,7 +143,7 @@ def generate_emb():
 
     global all_data, best_embeddings, best_model, all_hyperparameters, curr_hyperparameters, best_hyperparameters, all_losses, device
 
-    all_data = preprocess.read_graphs(config.SAVE_GRAPH)
+    all_data = preprocess.read_graphs(config.FOLDER_NAME + "edge_list.txt")
 
     # Iterate through hyperparameter type (shuffled)
     shuffled_param_type = random.sample(all_hyperparameters.keys(), len(all_hyperparameters.keys()))
@@ -149,7 +159,7 @@ def generate_emb():
             log_f.write(str(curr_hyperparameters) + "\n")
 
             # Set up
-            model = mdl.TrainNet(all_data.x.shape[1], curr_hyperparameters['hidden'], curr_hyperparameters['output'], curr_hyperparameters['dropout']).to(device)
+            model = mdl.TrainNet(all_data.x.shape[1], curr_hyperparameters['hidden'], curr_hyperparameters['output'], config.CONV.lower().split("_")[0], curr_hyperparameters['dropout']).to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr = curr_hyperparameters['lr'], weight_decay = curr_hyperparameters['wd'])
 
             # Train model
@@ -176,5 +186,5 @@ def generate_emb():
     test(best_model)
 
     # Save best embeddings
-    torch.save(best_embeddings, config.SAVE_NODE_EMB)
+    torch.save(best_embeddings, config.FOLDER_NAME + config.CONV.lower() + "_embeddings.pth")
 

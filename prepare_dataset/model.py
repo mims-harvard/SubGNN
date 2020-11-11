@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from torch.nn import Linear, LayerNorm, ReLU
-from torch_geometric.nn import GINConv 
+from torch_geometric.nn import GINConv, GCNConv 
 import torch.nn.functional as F
 
 # General	
@@ -13,12 +13,21 @@ import utils
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class TrainNet(nn.Module):
-    def __init__(self, nfeat, nhid, nclass, dropout):
+    def __init__(self, nfeat, nhid, nclass, conv_type, dropout):
         super(TrainNet, self).__init__()
-        nn1 = nn.Sequential(nn.Linear(nfeat, nhid))
-        self.conv1 = GINConv(nn1)
-        nn2 = nn.Sequential(nn.Linear(nhid, nclass))
-        self.conv2 = GINConv(nn2)
+
+        # GINConv
+        if conv_type == "gin": 
+            nn1 = nn.Sequential(nn.Linear(nfeat, nhid))
+            self.conv1 = GINConv(nn1)
+            nn2 = nn.Sequential(nn.Linear(nhid, nclass))
+            self.conv2 = GINConv(nn2)
+
+        # GCNConv
+        if conv_type == "gcn":
+            self.conv1 = GCNConv(nfeat, nhid)
+            self.conv2 = GCNConv(nhid, nclass)
+
         self.dropout = dropout
 
     def forward(self, x, edge_index):

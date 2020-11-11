@@ -21,7 +21,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 import sys
 sys.path.insert(0, '../') # add config to path
-import synthetic_graph_config as config
+import config_prepare_dataset as config
 import utils
 
 

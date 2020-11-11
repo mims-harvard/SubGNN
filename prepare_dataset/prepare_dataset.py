@@ -7,7 +7,10 @@ import logging
 from collections import Counter, defaultdict
 import sys
 sys.path.insert(0, '../') # add config to path
-import synthetic_graph_config as config
+import config_prepare_dataset as config
+import os
+if not os.path.exists(config.FOLDER_NAME):
+    os.makedirs(config.FOLDER_NAME)
 import train_node_emb
 
 # Pytorch
@@ -18,7 +21,7 @@ from torch_geometric.utils import from_networkx
 # NetworkX
 import networkx as nx
 from networkx.generators.random_graphs import barabasi_albert_graph, extended_barabasi_albert_graph
-from networkx.generators.duplication import duplication_divergence_graph # coreness
+from networkx.generators.duplication import duplication_divergence_graph
 
 
 class SyntheticGraph():
@@ -813,11 +816,11 @@ def main():
                                          subgraph_generator = config.SUBGRAPH_GENERATOR,
                                          modify_graph_for_properties = config.MODIFY_GRAPH_FOR_PROPERTIES,
                                          desired_property = config.DESIRED_PROPERTY)
-        nx.write_edgelist(synthetic_graph.graph, config.SAVE_GRAPH, data=False) 
+        nx.write_edgelist(synthetic_graph.graph, config.FOLDER_NAME + "edge_list.txt", data=False) 
         sub_G = synthetic_graph.subgraphs
         sub_G_label = synthetic_graph.subgraph_labels
         mask = generate_mask(len(sub_G_label)) 
-        write_f(config.SAVE_SUBGRAPHS, sub_G, sub_G_label, mask)
+        write_f(config.FOLDER_NAME + "subgraphs.pth", sub_G, sub_G_label, mask)
     if config.GENERATE_NODE_EMB: train_node_emb.generate_emb() 
 
 
