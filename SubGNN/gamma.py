@@ -11,6 +11,7 @@ import networkx as nx
 from fastdtw import fastdtw
 
 # Our methods
+sys.path.insert(0, '..') # add config to path
 import config
 
 

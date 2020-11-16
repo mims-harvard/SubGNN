@@ -1,16 +1,29 @@
 from pathlib import Path
+import sys
 
-# Random Seed
-RANDOM_SEED = 42
+sys.path.insert(0, '..') # add config to path
+import config as general_config
 
-# Output 
-FOLDER_NAME = "./example/"
+# Output directory ('density' as an example)
+DATASET_DIR = Path(general_config.PROJECT_ROOT) / "density"
 
 # Flags
+<<<<<<< HEAD
 GENERATE_SYNTHETIC_G = True 
 GENERATE_NODE_EMB = True 
 
 # Parameters for generating subgraphs with specific properties
+=======
+GENERATE_SYNTHETIC_G = True # whether to generate synthetic graph with below specified properties
+GENERATE_NODE_EMB = True # whether to generate node embeddings
+
+# Random Seed
+RANDOM_SEED = 42
+
+# Parameters for generating synthetic subgraphs with specific properties
+CONV = "gin"
+MINIBATCH = "NeighborSampler"
+>>>>>>> 0352f93f86bbb5694113617a8e7abe0e5e3ea567
 DESIRED_PROPERTY = "density"
 BASE_GRAPH_TYPE = "barabasi_albert"
 SUBGRAPH_TYPE = "bfs"
@@ -50,3 +63,12 @@ POSSIBLE_NUM_HOPS = [1]
 POSSIBLE_WALK_LENGTH = [32]
 POSSIBLE_NUM_STEPS = [32]
 EPOCHS = 1
+
+# Flags for precomputing similarity metrics
+CALCULATE_SHORTEST_PATHS = True # Calculate pairwise shortest paths between all nodes in the graph
+CALCULATE_DEGREE_SEQUENCE = True # Create a dictionary containing degrees of the nodes in the graph
+CALCULATE_EGO_GRAPHS = True # Calculate the 1-hop ego graph associated with each node in the graph
+OVERRIDE = False # Overwrite a similarity file even if it exists
+N_PROCESSSES = 4 # Number of cores to use for multi-processsing when precomputing similarity metrics
+
+

@@ -1,4 +1,5 @@
 import sys
+sys.path.insert(0, '..') # add config to path
 import config
 import train as tr
 import os

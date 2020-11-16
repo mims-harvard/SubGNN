@@ -14,6 +14,7 @@ from torch_geometric.utils import add_self_loops
 from torch_geometric.nn import MessagePassing
 
 # Our methods
+sys.path.insert(0, '..') # add config to path
 import config
 
 
