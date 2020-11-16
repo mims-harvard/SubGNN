@@ -3,8 +3,7 @@ import numpy as np
 import random
 import argparse
 import os
-import sys
-sys.path.insert(0, '../') # add config to path
+
 import config_prepare_dataset as config
 import preprocess
 import model as mdl
@@ -18,7 +17,7 @@ if config.MINIBATCH == "GraphSaint": from torch_geometric.data import GraphSAINT
 from torch_geometric.utils import negative_sampling 
 
 # Global Variables
-log_f = open(config.FOLDER_NAME + "node_emb.log", "w")
+log_f = open(str(config.DATASET_DIR / "node_emb.log"), "w")
 all_data = None 
 device = None
 best_val_acc = -1
@@ -104,7 +103,7 @@ def train(epoch, model, optimizer):
     # Save best model and parameters
     if best_val_acc <= np.mean(acc_val) + eps:
         best_val_acc = np.mean(acc_val)
-        with open(config.FOLDER_NAME + "best_model.pth", 'wb') as f:
+        with open(str(config.DATASET_DIR / "best_model.pth"), 'wb') as f:
             torch.save(model.state_dict(), f)
         best_hyperparameters = curr_hyperparameters
         best_model = model
@@ -116,7 +115,7 @@ def test(model):
 
     global all_data, best_embeddings, best_hyperparameters, all_losses
 
-    model.load_state_dict(torch.load(config.FOLDER_NAME + "best_model.pth"))
+    model.load_state_dict(torch.load(str(config.DATASET_DIR / "best_model.pth")))
     model.to(device)
     model.eval()
 
@@ -128,7 +127,7 @@ def test(model):
     test_neg_edges = (test_pos_edges == 0)
 
     dot_embed = utils.el_dot(best_embeddings, test_total, test = True)
-    roc_score, ap_score, test_acc, test_f1 = utils.calc_roc_score(pred_all = dot_embed, pos_edges = test_pos_edges.flatten(), neg_edges = test_neg_edges.flatten(), loss = all_losses, save_plots = config.FOLDER_NAME + "train_plots.pdf")
+    roc_score, ap_score, test_acc, test_f1 = utils.calc_roc_score(pred_all = dot_embed, pos_edges = test_pos_edges.flatten(), neg_edges = test_neg_edges.flatten(), loss = all_losses, save_plots = config.DATASET_DIR / "train_plots.pdf")
     print('Test ROC score: {:.5f}'.format(roc_score))
     print('Test AP score: {:.5f}'.format(ap_score))
     print('Test Accuracy: {:.5f}'.format(test_acc))
@@ -143,7 +142,7 @@ def generate_emb():
 
     global all_data, best_embeddings, best_model, all_hyperparameters, curr_hyperparameters, best_hyperparameters, all_losses, device
 
-    all_data = preprocess.read_graphs(config.FOLDER_NAME + "edge_list.txt")
+    all_data = preprocess.read_graphs(config.DATASET_DIR / "edge_list.txt")
 
     # Iterate through hyperparameter type (shuffled)
     shuffled_param_type = random.sample(all_hyperparameters.keys(), len(all_hyperparameters.keys()))
@@ -186,5 +185,5 @@ def generate_emb():
     test(best_model)
 
     # Save best embeddings
-    torch.save(best_embeddings, config.FOLDER_NAME + config.CONV.lower() + "_embeddings.pth")
+    torch.save(best_embeddings, config.DATASET_DIR / (config.CONV.lower() + "_embeddings.pth"))
 

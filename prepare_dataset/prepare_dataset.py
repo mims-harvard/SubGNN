@@ -5,12 +5,12 @@ import random
 import typing
 import logging
 from collections import Counter, defaultdict
-import sys
-sys.path.insert(0, '../') # add config to path
+
 import config_prepare_dataset as config
 import os
-if not os.path.exists(config.FOLDER_NAME):
-    os.makedirs(config.FOLDER_NAME)
+if not os.path.exists(config.DATASET_DIR):
+    os.makedirs(config.DATASET_DIR)
+
 import train_node_emb
 
 # Pytorch
@@ -800,6 +800,10 @@ def write_f(sub_f, sub_G, sub_G_label, mask):
             elif m == 2: fout.write("\t".join(["-".join(g), str(l), "test", "\n"]))
 
 
+
+
+
+
 def main():
     if config.GENERATE_SYNTHETIC_G: 
         synthetic_graph = SyntheticGraph(base_graph_type = config.BASE_GRAPH_TYPE,
@@ -816,11 +820,11 @@ def main():
                                          subgraph_generator = config.SUBGRAPH_GENERATOR,
                                          modify_graph_for_properties = config.MODIFY_GRAPH_FOR_PROPERTIES,
                                          desired_property = config.DESIRED_PROPERTY)
-        nx.write_edgelist(synthetic_graph.graph, config.FOLDER_NAME + "edge_list.txt", data=False) 
+        nx.write_edgelist(synthetic_graph.graph, str(config.DATASET_DIR / "edge_list.txt"), data=False) 
         sub_G = synthetic_graph.subgraphs
         sub_G_label = synthetic_graph.subgraph_labels
         mask = generate_mask(len(sub_G_label)) 
-        write_f(config.FOLDER_NAME + "subgraphs.pth", sub_G, sub_G_label, mask)
+        write_f(str(config.DATASET_DIR / "subgraphs.pth"), sub_G, sub_G_label, mask)
     if config.GENERATE_NODE_EMB: train_node_emb.generate_emb() 
 
 
