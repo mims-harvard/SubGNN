@@ -4,10 +4,8 @@ import pandas as pd
 import random
 import typing
 import logging
+import os
 from collections import Counter, defaultdict
-import sys
-sys.path.insert(0, '../') # add config to path
-import synthetic_graph_config as config
 
 # Pytorch
 import torch
@@ -19,6 +17,8 @@ import networkx as nx
 from networkx.generators.random_graphs import barabasi_albert_graph, extended_barabasi_albert_graph
 from networkx.generators.duplication import duplication_divergence_graph # coreness
 
+# Our methods
+import synthetic_graph_config as config
 
 class SyntheticGraph():
 
@@ -797,11 +797,15 @@ def main():
                                      subgraph_generator = config.SUBGRAPH_GENERATOR,
                                      modify_graph_for_properties = config.MODIFY_GRAPH_FOR_PROPERTIES,
                                      desired_property = config.DESIRED_PROPERTY)
-    nx.write_edgelist(synthetic_graph.graph, config.SAVE_GRAPH, data=False) 
+    
+    if not os.path.exists(config.OUTPUT_DIR):
+        os.makedirs(config.OUTPUT_DIR)
+
+    nx.write_edgelist(synthetic_graph.graph, str(config.OUTPUT_DIR / 'edge_list.txt'), data=False) 
     sub_G = synthetic_graph.subgraphs
     sub_G_label = synthetic_graph.subgraph_labels
     mask = generate_mask(len(sub_G_label)) 
-    write_f(config.SAVE_SUBGRAPHS, sub_G, sub_G_label, mask)
+    write_f(str(config.OUTPUT_DIR / 'subgraphs.pth'), sub_G, sub_G_label, mask)
 
 
 if __name__ == "__main__":

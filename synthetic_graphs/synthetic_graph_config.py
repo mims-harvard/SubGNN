@@ -1,11 +1,14 @@
 from pathlib import Path
+import sys
+
+sys.path.insert(0, '../SubGNN') # add config to path
+import config as general_config
 
 # Random Seed
 RANDOM_SEED = 42
 
-# Output files
-SAVE_GRAPH = "example_edge_list.txt"
-SAVE_SUBGRAPHS = "example_subgraphs.pth"
+# Output directory - NOTE: the name of the dataset directory should be the "task" name in the SubGNN config files
+OUTPUT_DIR = general_config.PROJECT_ROOT / 'density'
 
 # Parameters for generating subgraphs with specific properties
 DESIRED_PROPERTY = "density"
