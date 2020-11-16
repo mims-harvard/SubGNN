@@ -10,6 +10,7 @@ import time
 import torch
 
 # Our Methods
+sys.path.insert(0, '..') # add config to path
 import config
 import subgraph_utils
 

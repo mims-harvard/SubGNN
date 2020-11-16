@@ -18,6 +18,7 @@ from torch.nn.functional import one_hot
 
 
 # Our methods
+sys.path.insert(0, '..') # add config to path
 import config
 
 def read_subgraphs(sub_f, split = True):

@@ -30,6 +30,7 @@ from optuna.integration import PyTorchLightningPruningCallback
 
 # Our Methods
 import SubGNN as md
+sys.path.insert(0, '..') # add config to path
 import config
 
 

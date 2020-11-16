@@ -12,6 +12,7 @@ from multiprocessing import Pool
 from itertools import accumulate 
 from collections import OrderedDict
 import pickle
+import sys
 from functools import partial
 
 
@@ -46,6 +47,7 @@ import networkx as nx
 
 
 # Our Methods
+sys.path.insert(0, '..') # add config to path
 import config
 import subgraph_utils
 from subgraph_mpn import SG_MPN
