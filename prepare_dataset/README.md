@@ -1,12 +1,21 @@
-# Generating Synthetic Graphs
+# Prepare Dataset 
 
 ## Instructions
 
-1. Modify the `synthetic_graph_config.py` file in the current directory (`./SubGNN/synthetic_graph`)
-2. Run `python generate_synthetic_graph.py` 
+1. Modify the `config_prepare_dataset.py` file in the current directory (`./SubGNN/prepare_dataset`)
+2. Run `python prepare_dataset.py` 
+
+## Output 
+- `FOLDER_NAME` is the directory for output files (Ex: `./example/`) 
+
+## Flags
+- `GENERATE_SYNTHETIC_G` enables generating a synthetic base graph
+- `GENERATE_NODE_EMB` enables training for node embeddings 
 
 ## Parameters
 
+- `CONV` is the type of convolution layer from Pytorch geometric to use (i.e. `gin`, `graphsaint_gcn`)
+- `MINIBATCH` is the minibatching algorithm from Pytorch geometric to use (i.e. `NeighborSampler`, `GraphSaint`)
 - `DESIRED_PROPERTY` is the subgraph property to be predicted (i.e. density, cut ratio, component, coreness)
 - `BASE_GRAPH_TYPE` is the type of base graph to use (i.e. barabasi albert, duplication divergence graph)
 - `SUBGRAPH_TYPE` is the method used to add subgraphs (i.e. bfs, staple, plant)

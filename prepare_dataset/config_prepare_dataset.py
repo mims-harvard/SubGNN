@@ -1,14 +1,22 @@
 from pathlib import Path
+import sys
 
-PROJECT_ROOT = Path('.')
+sys.path.insert(0, '../SubGNN') # add config to path
+import config as general_config
 
+# Random Seed
 RANDOM_SEED = 42
 
-# Output files
-SAVE_GRAPH = "example_edge_list.txt"
-SAVE_SUBGRAPHS = "example_subgraphs.pth"
+# Output 
+FOLDER_NAME = "./example/"
+
+# Flags
+GENERATE_SYNTHETIC_G = True
+GENERATE_NODE_EMB = True 
 
 # Parameters for generating subgraphs with specific properties
+CONV = "gin"
+MINIBATCH = "NeighborSampler"
 DESIRED_PROPERTY = "density"
 BASE_GRAPH_TYPE = "barabasi_albert"
 SUBGRAPH_TYPE = "bfs"
@@ -34,3 +42,15 @@ CC_RANGE = [1, 1, 1, 1, 5, 6, 7, 8, 9, 10]
 
 MAX_TRIES = 100
 
+# Parameters for training node embeddings for base graph
+POSSIBLE_BATCH_SIZES = [512, 1024]
+POSSIBLE_HIDDEN = [128, 256]
+POSSIBLE_OUTPUT = [64]
+POSSIBLE_LR = [0.001, 0.005]
+POSSIBLE_WD = [5e-4, 5e-5]
+POSSIBLE_DROPOUT = [0.4, 0.5]
+POSSIBLE_NB_SIZE = [1.0]
+POSSIBLE_NUM_HOPS = [1]
+POSSIBLE_WALK_LENGTH = [32]
+POSSIBLE_NUM_STEPS = [32]
+EPOCHS = 1

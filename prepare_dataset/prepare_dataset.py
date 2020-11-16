@@ -7,7 +7,11 @@ import logging
 from collections import Counter, defaultdict
 import sys
 sys.path.insert(0, '../') # add config to path
-import synthetic_graph_config as config
+import config_prepare_dataset as config
+import os
+if not os.path.exists(config.FOLDER_NAME):
+    os.makedirs(config.FOLDER_NAME)
+import train_node_emb
 
 # Pytorch
 import torch
@@ -17,7 +21,7 @@ from torch_geometric.utils import from_networkx
 # NetworkX
 import networkx as nx
 from networkx.generators.random_graphs import barabasi_albert_graph, extended_barabasi_albert_graph
-from networkx.generators.duplication import duplication_divergence_graph # coreness
+from networkx.generators.duplication import duplication_divergence_graph
 
 
 class SyntheticGraph():
@@ -101,7 +105,8 @@ class SyntheticGraph():
             raise Exception('The subgraph generation you specified is not implemented')
 
         if modify_graph_for_properties:
-            self._modify_graph_for_desired_subgraph_properties(subgraphs, **kwargs)
+            self._modify_graph_for_desired_subgraph_properties(subgraphs, **kwargs) 
+            self._relabel_nodes(subgraphs, **kwargs) 
 
         return subgraphs
 
@@ -618,6 +623,21 @@ class SyntheticGraph():
             else:
                 raise Exception('Other properties have not yet been implemented')
          
+    def _relabel_nodes(self, subgraphs, **kwargs):
+        """
+        Relabel nodes in the graph and subgraphs to ensure that all nodes are indexed consecutively 
+        """
+        largest_cc = max(nx.connected_components(self.graph), key=len) 
+        removed_nodes = set(list(self.graph.nodes)).difference(set(largest_cc)) 
+        print("Original graph: %d, Largest cc: %d, Removed nodes: %d" % (len(self.graph.nodes), len(largest_cc), len(removed_nodes))) 
+        self.graph = self.graph.subgraph(largest_cc)
+        mapping = {k: v for k, v in zip(list(self.graph.nodes), range(len(self.graph.nodes)))} 
+        self.graph = nx.relabel_nodes(self.graph, mapping) 
+        new_subgraphs = [] 
+        for s in subgraphs:
+            new_s = [mapping[n] for n in s if n not in removed_nodes] 
+            new_subgraphs.append(new_s) 
+        return new_subgraphs 
                     
     def generate_subgraph_labels(self, **kwargs):
         """
@@ -638,8 +658,6 @@ class SyntheticGraph():
         coreness = []
         cc = []
         desired_property = kwargs.get('desired_property', 'density')
-
-        print(self.subgraphs)
 
         for subgraph_nodes in self.subgraphs:
             
@@ -783,25 +801,27 @@ def write_f(sub_f, sub_G, sub_G_label, mask):
 
 
 def main():
-    synthetic_graph = SyntheticGraph(base_graph_type = config.BASE_GRAPH_TYPE,
-                                     subgraph_type = config.SUBGRAPH_TYPE,
-                                     n_subgraphs = config.N_SUBGRAPHS,
-                                     n_connected_components = config.N_CONNECTED_COMPONENTS,
-                                     n_subgraph_nodes = config.N_SUBGRAPH_NODES,
-                                     features_type = config.FEATURES_TYPE,
-                                     n = config.N,
-                                     p = config.P,
-                                     q = config.Q,
-                                     m = config.M,
-                                     n_bins = config.N_BINS,
-                                     subgraph_generator = config.SUBGRAPH_GENERATOR,
-                                     modify_graph_for_properties = config.MODIFY_GRAPH_FOR_PROPERTIES,
-                                     desired_property = config.DESIRED_PROPERTY)
-    nx.write_edgelist(synthetic_graph.graph, config.SAVE_GRAPH) 
-    sub_G = synthetic_graph.subgraphs
-    sub_G_label = synthetic_graph.subgraph_labels
-    mask = generate_mask(len(sub_G_label)) 
-    write_f(config.SAVE_SUBGRAPHS, sub_G, sub_G_label, mask)
+    if config.GENERATE_SYNTHETIC_G: 
+        synthetic_graph = SyntheticGraph(base_graph_type = config.BASE_GRAPH_TYPE,
+                                         subgraph_type = config.SUBGRAPH_TYPE,
+                                         n_subgraphs = config.N_SUBGRAPHS,
+                                         n_connected_components = config.N_CONNECTED_COMPONENTS,
+                                         n_subgraph_nodes = config.N_SUBGRAPH_NODES,
+                                         features_type = config.FEATURES_TYPE,
+                                         n = config.N,
+                                         p = config.P,
+                                         q = config.Q,
+                                         m = config.M,
+                                         n_bins = config.N_BINS,
+                                         subgraph_generator = config.SUBGRAPH_GENERATOR,
+                                         modify_graph_for_properties = config.MODIFY_GRAPH_FOR_PROPERTIES,
+                                         desired_property = config.DESIRED_PROPERTY)
+        nx.write_edgelist(synthetic_graph.graph, config.FOLDER_NAME + "edge_list.txt", data=False) 
+        sub_G = synthetic_graph.subgraphs
+        sub_G_label = synthetic_graph.subgraph_labels
+        mask = generate_mask(len(sub_G_label)) 
+        write_f(config.FOLDER_NAME + "subgraphs.pth", sub_G, sub_G_label, mask)
+    if config.GENERATE_NODE_EMB: train_node_emb.generate_emb() 
 
 
 if __name__ == "__main__":
