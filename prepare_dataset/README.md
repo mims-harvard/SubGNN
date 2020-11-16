@@ -26,7 +26,7 @@ After you have formatted your data, run `python prepare_dataset.py` to generate 
 4. Run `python precompute_graph_metrics.py`
 
 ### Output 
-- `DATASET_DIR` is the directory for output files (Ex: `example/`). We recommend naming the output directory as the name of your dataset. 
+- `DATASET_DIR` is the directory for output files (Ex: `density`). We recommend naming the output directory as the name of your dataset. 
 
 ### Flags
 - `GENERATE_SYNTHETIC_G` enables generating a synthetic base graph
