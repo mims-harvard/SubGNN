@@ -52,7 +52,7 @@ After you have formatted your data, run `python prepare_dataset.py` to generate 
 - `MODIFY_GRAPH_FOR_PROPERTIES` is the flag for whether or not to modify graphs in order to achieve the desired property 
 
 
-
+To generate `GIN` embeddings as in our paper, specify `CONV` = `gin` and `MINIBATCH` = `NeighborSampler`. To generate `GraphSaint` embeddings as in our work, specify `CONV` = `graphsaint_gcn` and `MINIBATCH` = `GraphSaint`.
 
 The following examples are the parameters used to create the synthetic graphs described in the SubGNN paper.
 
