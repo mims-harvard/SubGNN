@@ -8,7 +8,7 @@ Authors: [Emily Alsentzer*](https://emilyalsentzer.github.io/), [Sam Finlayson*]
 To use SubGNN, do the following:
 
 - Install the environment
-- Prepare data by either downloading our provided datasets or following the steps in the `prepare_dataset` folder README to either generate synthetic datasets or format your own data.
+- Prepare data by either downloading our provided datasets or following the steps in the [`prepare_dataset` folder README](https://github.com/mims-harvard/SubGNN/tree/main/prepare_dataset#prepare-dataset) to either generate synthetic datasets or format your own data.
 - Train and evaluate SubGNN
 
 ## Install the Environment
