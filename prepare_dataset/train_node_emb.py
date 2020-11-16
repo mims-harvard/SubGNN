@@ -31,8 +31,8 @@ print('Using device:', device)
 best_hyperparameters = dict()
 if device.type == 'cuda': print(torch.cuda.get_device_name(0))
 if config.MINIBATCH == "NeighborSampler":
-    all_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES, 'hidden': config.POSSIBLE_HIDDEN, 'output': config.POSSIBLE_OUTPUT, 'lr': config.POSSIBLE_LR, 'wd': config.POSSIBLE_WD, 'nb_size': config.POSSIBLE_NB_SIZE, 'n_hops': config.POSSIBLE_NUM_HOPS, 'dropout': config.POSSIBLE_DROPOUT}
-    curr_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES[0], 'hidden': config.POSSIBLE_HIDDEN[0], 'output': config.POSSIBLE_OUTPUT[0], 'lr': config.POSSIBLE_LR[0], 'wd': config.POSSIBLE_WD[0], 'nb_size': config.POSSIBLE_NB_SIZE[0], 'n_hops': config.POSSIBLE_NUM_HOPS[0], 'dropout': config.POSSIBLE_DROPOUT[0]}
+    all_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES, 'hidden': config.POSSIBLE_HIDDEN, 'output': config.POSSIBLE_OUTPUT, 'lr': config.POSSIBLE_LR, 'wd': config.POSSIBLE_WD, 'nb_size': config.POSSIBLE_NB_SIZE, 'dropout': config.POSSIBLE_DROPOUT}
+    curr_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES[0], 'hidden': config.POSSIBLE_HIDDEN[0], 'output': config.POSSIBLE_OUTPUT[0], 'lr': config.POSSIBLE_LR[0], 'wd': config.POSSIBLE_WD[0], 'nb_size': config.POSSIBLE_NB_SIZE[0], 'dropout': config.POSSIBLE_DROPOUT[0]}
 elif config.MINIBATCH == "GraphSaint":
     all_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES, 'hidden': config.POSSIBLE_HIDDEN, 'output': config.POSSIBLE_OUTPUT, 'lr': config.POSSIBLE_LR, 'wd': config.POSSIBLE_WD, 'walk_length': config.POSSIBLE_WALK_LENGTH, 'num_steps': config.POSSIBLE_NUM_STEPS, 'dropout': config.POSSIBLE_DROPOUT}
     curr_hyperparameters = {'batch_size': config.POSSIBLE_BATCH_SIZES[0], 'hidden': config.POSSIBLE_HIDDEN[0], 'output': config.POSSIBLE_OUTPUT[0], 'lr': config.POSSIBLE_LR[0], 'wd': config.POSSIBLE_WD[0], 'walk_length': config.POSSIBLE_WALK_LENGTH[0], 'num_steps': config.POSSIBLE_NUM_STEPS[0], 'dropout': config.POSSIBLE_DROPOUT[0]}
@@ -51,8 +51,7 @@ def train(epoch, model, optimizer):
 
     # Minibatches
     if config.MINIBATCH == "NeighborSampler": 
-        loader = NeighborSampler(all_data, size = curr_hyperparameters['nb_size'], num_hops = curr_hyperparameters['n_hops'], batch_size = curr_hyperparameters['batch_size'], shuffle = True, bipartite = False) 
-        loader = loader()
+        loader = NeighborSampler(all_data.edge_index, sizes = [curr_hyperparameters['nb_size']], batch_size = curr_hyperparameters['batch_size'], shuffle = True) 
     elif config.MINIBATCH == "GraphSaint": 
         all_data.num_classes = torch.tensor([2]) 
         loader = GraphSAINTRandomWalkSampler(all_data, batch_size=curr_hyperparameters['batch_size'], walk_length=curr_hyperparameters['walk_length'], num_steps=curr_hyperparameters['num_steps']) 
@@ -60,7 +59,7 @@ def train(epoch, model, optimizer):
     # Iterate through minibatches
     for data in loader:
         
-        if config.MINIBATCH == "NeighborSampler": data = preprocess.set_data(data, all_data) 
+        if config.MINIBATCH == "NeighborSampler": data = preprocess.set_data(data, all_data, config.MINIBATCH) 
         curr_train_pos = data.edge_index[:, data.train_mask] 
         curr_train_neg = negative_sampling(curr_train_pos, num_neg_samples=curr_train_pos.size(1) // 4) 
         curr_train_total = torch.cat([curr_train_pos, curr_train_neg], dim=-1) 
@@ -186,5 +185,6 @@ def generate_emb():
     test(best_model)
 
     # Save best embeddings
-    torch.save(best_embeddings, config.FOLDER_NAME + config.CONV.lower() + "_embeddings.pth")
+    if config.MINIBATCH != "GraphSaint": torch.save(best_embeddings, config.FOLDER_NAME + config.CONV.lower() + "_embeddings.pth")
+    else: torch.save(best_embeddings, config.FOLDER_NAME + config.CONV.lower() + "_graphsaint_embeddings.pth")
 

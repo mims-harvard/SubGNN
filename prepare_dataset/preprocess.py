@@ -1,6 +1,5 @@
 # General
 import numpy as np
-import pandas as pd
 import random
 import pickle
 from collections import Counter
@@ -85,18 +84,22 @@ def create_dataset(G, feat_mat, split=False):
     return new_G
 
 
-def set_data(data, all_data):
+def set_data(data, all_data, minibatch):
     """
     Create per-minibatch Data object
 
     Args
         - data (Data object): batched dataset
         - all_data (Data object): full dataset
+        - minibatch (str): NeighborSampler
 
     Return
         - data (Data object): base graph as Pytorch Geometric Data object
     """
 
+    if minibatch == "NeighborSampler":
+        batch_size, n_id, adjs = data
+        data = Data(edge_index = adjs[0], n_id = n_id, e_id = adjs[1]) 
     data.x = all_data.x[data.n_id]
     data.train_mask = all_data.train_mask[data.e_id]
     data.val_mask = all_data.val_mask[data.e_id]
