@@ -19,16 +19,16 @@ We provide a yml file containing the necessary packages for SubGNN. Once you hav
 conda env create --file SubGNN.yml 
 ```
 ## Prepare data
-Prepare data for SubGNN by either (1) downloading our provided datasets or following the steps in the `prepare_dataset` folder README to either (2) generate synthetic datasets or (3) format your own data.
+Prepare data for SubGNN by either (1) downloading our provided datasets or following the steps in the `prepare_dataset` folder README to (2) generate synthetic datasets or (3) format your own data.
 
-**Real-World Datasets:** We are releasing four new real-world datasets: HPO-NEURO, HPO-METAB, PPI-BP, and EM-USER. You can download these files from dropbox [here](https://www.dropbox.com/sh/zv7gw2bqzqev9yn/AACR9iR4Ok7f9x1fIAiVCdj3a?dl=0). You should unzip the folder and set the project directory below to the path where you downloaded the data (e.g. `/PATH/TO/SubGNN_data`). 
+**Real-World Datasets:** We are releasing four new real-world datasets: HPO-NEURO, HPO-METAB, PPI-BP, and EM-USER. You can download these files from Dropbox [here](https://www.dropbox.com/sh/zv7gw2bqzqev9yn/AACR9iR4Ok7f9x1fIAiVCdj3a?dl=0). You should unzip the folder and set the project directory below to the path where you downloaded the data (e.g. `/PATH/TO/SubGNN_data`). 
 
 **Synthetic Datasets:** We also provide a script to generate the DENSITY, CORENESS, COMPONENT, and CUTRATIO synthetic graphs featured in our paper. See the [README](https://github.com/mims-harvard/SubGNN/tree/main/prepare_dataset#prepare-dataset) in the `prepare_dataset` folder for more information on how to generate these synthetic datasets.
 
 **Your Own Data:** To use your own data with SubGNN, you will need an edge list file containing the edges of the base graph and a file containing the node ids of the subgraphs, their labels, and whether they are in the train/val/test splits. Then you will need to generate node embeddings and precompute similarity metrics. For more info on how to do this, refer to the [README](https://github.com/mims-harvard/SubGNN/tree/main/prepare_dataset#prepare-dataset) in the `prepare_dataset` folder.
 
 ## How to Train
-To train SubGNN, you should first specify your project directory via `PROJECT_ROOT` in `config.py`. This directory should include folders containing all datasets and will ultimately contain all tensorboard folders with model outputs. Then modify the config.json file for the appropriate dataset to set the tensorboard output directory and the hyperparameter search ranges, including which SubGNN channels (neighborhood, structure, or position) to turn on.  To learn more about the hyperparameters, go to the `README` in the config_files folder. Finally, train the model via the following: 
+To train SubGNN, you should first specify your project directory via `PROJECT_ROOT` in `config.py`. This directory should include folders containing all datasets and will ultimately contain all tensorboard folders with model outputs. Then, modify the `config.json` file for the appropriate dataset to set the tensorboard output directory and the hyperparameter search ranges, including which SubGNN channels (neighborhood, structure, or position) to turn on.  To learn more about the hyperparameters, go to the `README` in the `config_files` folder. Finally, train the model via the following: 
 
 ```
 cd SubGNN
