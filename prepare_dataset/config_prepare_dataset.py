@@ -8,12 +8,6 @@ import config as general_config
 DATASET_DIR = Path(general_config.PROJECT_ROOT) / "density"
 
 # Flags
-<<<<<<< HEAD
-GENERATE_SYNTHETIC_G = True 
-GENERATE_NODE_EMB = True 
-
-# Parameters for generating subgraphs with specific properties
-=======
 GENERATE_SYNTHETIC_G = True # whether to generate synthetic graph with below specified properties
 GENERATE_NODE_EMB = True # whether to generate node embeddings
 
@@ -21,9 +15,6 @@ GENERATE_NODE_EMB = True # whether to generate node embeddings
 RANDOM_SEED = 42
 
 # Parameters for generating synthetic subgraphs with specific properties
-CONV = "gin"
-MINIBATCH = "NeighborSampler"
->>>>>>> 0352f93f86bbb5694113617a8e7abe0e5e3ea567
 DESIRED_PROPERTY = "density"
 BASE_GRAPH_TYPE = "barabasi_albert"
 SUBGRAPH_TYPE = "bfs"
@@ -62,7 +53,7 @@ POSSIBLE_NB_SIZE = [-1]
 POSSIBLE_NUM_HOPS = [1]
 POSSIBLE_WALK_LENGTH = [32]
 POSSIBLE_NUM_STEPS = [32]
-EPOCHS = 1
+EPOCHS = 100
 
 # Flags for precomputing similarity metrics
 CALCULATE_SHORTEST_PATHS = True # Calculate pairwise shortest paths between all nodes in the graph

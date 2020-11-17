@@ -2,7 +2,7 @@
 
 ## Dataset Options
 
-There are three options for preparing the data for SubGNN. Before do any of these, make sure you set the `PROJECT_ROOT` in `config.py`.
+There are three options for preparing the data for SubGNN. Before doing any of these, make sure you set the `PROJECT_ROOT` in `config.py`.
 
 ### Real-World Datasets
 
@@ -10,13 +10,13 @@ Follow the instructions in the dataset section [here](https://github.com/mims-ha
 
 ### Synthetic Datasets
 
-To generate synthetic datasets, first run  `python prepare_dataset.py` to generate synthetic base graph and subgraphs and generate node embeddings. To do this, make sure that the `GENERATE_SYNTHETIC_G` and `GENERATE_NODE_EMB` flags are set to `True` in the `config_prepare_dataset.py` file. Set `DATASET_DIR` to the dataset name (e.g. `density`). Then run `python precompute_graph_metrics.py` to precompute node degrees, pairwise shortest paths, and the ego graphs for each node in the base graph. These precomputations will speed up similarity calculations in SubGNN. Afterwards, all of the necessary files to run SubGNN should exist in the `DATASET_DIR` folder. 
+To generate synthetic datasets, first run  `python prepare_dataset.py` to generate the synthetic base graph, subgraphs, and node embeddings. To do this, make sure that the `GENERATE_SYNTHETIC_G` and `GENERATE_NODE_EMB` flags are set to `True` in the `config_prepare_dataset.py` file. Set `DATASET_DIR` to the dataset name (e.g. `density`). Then, run `python precompute_graph_metrics.py` to precompute node degrees, pairwise shortest paths, and the ego graphs for each node in the base graph. These precomputations will speed up similarity calculations in SubGNN. Afterwards, all of the necessary files to run SubGNN should exist in the `DATASET_DIR` folder. 
 
 ### Your own Data
 
-To use your own data with SubGNN, you will need (1) an edge list for your base graph named `edge_list.txt` and (2) a file containing your subgraphs & labels named `subgraphs.pth`. The edge list is a space separated file where each line contains the start and end node id of an edge. If your graph is in networkx, you generate this file by running [`nx.write_edgelist(GRAPH, DATASET_DIR /"edge_list.txt", data=False)`](https://networkx.org/documentation/stable//reference/readwrite/generated/networkx.readwrite.edgelist.write_edgelist.html). The subgraph file is a tab-separated file where each line contains information about a subgraph via the format `"{SUBGRAPH_IDS}\t{LABEL}\t{DATASET}\n"`. `SUBGRAPH_IDS` contains the node ids of all nodes in the subgraph joined by "-" (i.e. `"-".join(subgraph_ids)`), `LABEL` is the subgraph label as a string, and `DATASET` is either "train", "val", or "test". You can look at the 4 real-world datasets that we provide as a example of this format. 
+To use your own data with SubGNN, you will need (1) an edge list for your base graph named `edge_list.txt` and (2) a file containing your subgraphs & labels named `subgraphs.pth`. The edge list is a space separated file where each line contains the start and end node id of an edge. If your graph is in networkx, you can generate this file by running [`nx.write_edgelist(GRAPH, DATASET_DIR / "edge_list.txt", data=False)`](https://networkx.org/documentation/stable//reference/readwrite/generated/networkx.readwrite.edgelist.write_edgelist.html). The subgraph file is a tab-separated file where each line contains information about a subgraph via the format `"{SUBGRAPH_IDS}\t{LABEL}\t{DATASET}\n"`. `SUBGRAPH_IDS` contains the node ids of all nodes in the subgraph joined by "-" (i.e. `"-".join(subgraph_ids)`), `LABEL` is the subgraph label as a string, and `DATASET` is either "train", "val", or "test". You can look at the 4 real-world datasets that we provide as examples of this format. 
 
-After you have formatted your data, run `python prepare_dataset.py` to generate node embeddings (set `GENERATE_SYNTHETIC_G` to false and `GENERATE_NODE_EMB` to true). Set `DATASET_DIR` to the dataset name (e.g. `your_custom_data`). Then run `python precompute_graph_metrics.py` to precompute node degrees, pairwise shortest paths, and the ego graphs for each node in the base graph. Afterwards, all of the necessary files to run SubGNN should exist in the `DATASET_DIR` folder. 
+After you have formatted your data, run `python prepare_dataset.py` to generate node embeddings (set `GENERATE_SYNTHETIC_G` to FALSE and `GENERATE_NODE_EMB` to TRUE). Set `DATASET_DIR` to the dataset name (e.g. `your_custom_data`). Then, run `python precompute_graph_metrics.py` to precompute node degrees, pairwise shortest paths, and the ego graphs for each node in the base graph. Afterwards, all of the necessary files to run SubGNN should exist in the `DATASET_DIR` folder. 
 
 ## How to Prepare Data
 
@@ -52,7 +52,7 @@ After you have formatted your data, run `python prepare_dataset.py` to generate 
 - `MODIFY_GRAPH_FOR_PROPERTIES` is the flag for whether or not to modify graphs in order to achieve the desired property 
 
 
-To generate `GIN` embeddings as in our paper, specify `CONV` = `gin` and `MINIBATCH` = `NeighborSampler`. To generate `GraphSaint` embeddings as in our work, specify `CONV` = `graphsaint_gcn` and `MINIBATCH` = `GraphSaint`.
+To generate `GIN` embeddings as in our paper, specify `CONV` = `gin` and `MINIBATCH` = `NeighborSampler`. To generate `GraphSaint` embeddings as in our work, specify `CONV` = `gcn_graphsaint` and `MINIBATCH` = `GraphSaint`.
 
 The following examples are the parameters used to create the synthetic graphs described in the SubGNN paper.
 

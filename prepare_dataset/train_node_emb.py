@@ -141,7 +141,7 @@ def generate_emb():
 
     global all_data, best_embeddings, best_model, all_hyperparameters, curr_hyperparameters, best_hyperparameters, all_losses, device
 
-    all_data = preprocess.read_graphs(config.DATASET_DIR / "edge_list.txt")
+    all_data = preprocess.read_graphs(str(config.DATASET_DIR / "edge_list.txt"))
 
     # Iterate through hyperparameter type (shuffled)
     shuffled_param_type = random.sample(all_hyperparameters.keys(), len(all_hyperparameters.keys()))
@@ -184,10 +184,4 @@ def generate_emb():
     test(best_model)
 
     # Save best embeddings
-<<<<<<< HEAD
-    if config.MINIBATCH != "GraphSaint": torch.save(best_embeddings, config.FOLDER_NAME + config.CONV.lower() + "_embeddings.pth")
-    else: torch.save(best_embeddings, config.FOLDER_NAME + config.CONV.lower() + "_graphsaint_embeddings.pth")
-=======
-    torch.save(best_embeddings, config.DATASET_DIR / (config.CONV.lower() + "_embeddings.pth"))
->>>>>>> 0352f93f86bbb5694113617a8e7abe0e5e3ea567
-
+    torch.save(best_embeddings, config.DATASET_DIR / (config.CONV.lower() + "_embeddings.pth")) 
