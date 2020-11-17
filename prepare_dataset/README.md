@@ -112,7 +112,7 @@ The following examples are the parameters used to create the synthetic graphs de
         DESIRED_PROPERTY = 'coreness'
         BASE_GRAPH_TYPE = 'duplication_divergence_graph' 
         SUBGRAPH_TYPE = 'plant'
-        N_SUBGRAPHS = 30
+        N_SUBGRAPHS = 30 # Number of subgraphs per coreness value; N_SUBGRAPHS = 30 results in ~250 total subgraphs
         N_CONNECTED_COMPONENTS = 1
         N_SUBGRAPH_NODES = 20
         FEATURES_TYPE='one_hot'
