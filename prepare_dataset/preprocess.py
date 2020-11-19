@@ -97,9 +97,8 @@ def set_data(data, all_data, minibatch):
         - data (Data object): base graph as Pytorch Geometric Data object
     """
 
-    if minibatch == "NeighborSampler":
-        batch_size, n_id, adjs = data
-        data = Data(edge_index = adjs[0], n_id = n_id, e_id = adjs[1]) 
+    batch_size, n_id, adjs = data
+    data = Data(edge_index = adjs[0], n_id = n_id, e_id = adjs[1]) 
     data.x = all_data.x[data.n_id]
     data.train_mask = all_data.train_mask[data.e_id]
     data.val_mask = all_data.val_mask[data.e_id]
