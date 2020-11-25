@@ -179,11 +179,10 @@ class SG_MPN(MessagePassing):
         # Everything else is identical to propagate function from Pytorch Geometric.
          
         r"""The initial call to start propagating messages.
-
         Args:
-            adj (Tensor or SparseTensor): A :obj:`torch.LongTensor` or a
+            edge_index (Tensor or SparseTensor): A :obj:`torch.LongTensor` or a
                 :obj:`torch_sparse.SparseTensor` that defines the underlying
-                message propagation.
+                graph connectivity/message passing flow.
                 :obj:`edge_index` holds the indices of a general (sparse)
                 assignment matrix of shape :obj:`[N, M]`.
                 If :obj:`edge_index` is of type :obj:`torch.LongTensor`, its
@@ -195,12 +194,11 @@ class SG_MPN(MessagePassing):
                 :obj:`torch_sparse.SparseTensor`, its sparse indices
                 :obj:`(row, col)` should relate to :obj:`row = edge_index[1]`
                 and :obj:`col = edge_index[0]`.
-                Hence, the only difference between those formats is that we
-                need to input the *transposed* sparse adjacency matrix into
+                The major difference between both formats is that we need to
+                input the *transposed* sparse adjacency matrix into
                 :func:`propagate`.
-            size (list or tuple, optional): The size :obj:`[N, M]` of the
-                assignment matrix in case :obj:`edge_index` is a
-                :obj:`LongTensor`.
+            size (tuple, optional): The size :obj:`(N, M)` of the assignment
+                matrix in case :obj:`edge_index` is a :obj:`LongTensor`.
                 If set to :obj:`None`, the size will be automatically inferred
                 and assumed to be quadratic.
                 This argument is ignored in case :obj:`edge_index` is a
@@ -208,48 +206,23 @@ class SG_MPN(MessagePassing):
             **kwargs: Any additional data which is needed to construct and
                 aggregate messages, and to update node embeddings.
         """
+        size = self.__check_input__(edge_index, size)
 
-        # We need to distinguish between the old `edge_index` format and the
-        # new `torch_sparse.SparseTensor` format.
-        mp_type = self.__get_mp_type__(edge_index)
+        # run both functions in separation.
+        coll_dict = self.__collect__(self.__user_args__, edge_index, size,
+                                        kwargs)
 
-        if mp_type == 'adj_t' and self.flow == 'target_to_source':
-            raise ValueError(
-                ('Flow direction "target_to_source" is invalid for message '
-                 'propagation based on `torch_sparse.SparseTensor`. If you '
-                 'really want to make use of a reverse message passing flow, '
-                 'pass in the transposed sparse tensor to the message passing '
-                 'module, e.g., `adj.t()`.'))
-
-        if mp_type == 'edge_index':
-            if size is None:
-                size = [None, None]
-            elif isinstance(size, int):
-                size = [size, size]
-            elif torch.is_tensor(size):
-                size = size.tolist()
-            elif isinstance(size, tuple):
-                size = list(size)
-        elif mp_type == 'adj_t':
-            size = list(edge_index.sparse_sizes())[::-1]
-
-        assert isinstance(size, list)
-        assert len(size) == 2
-
-        # We collect all arguments used for message passing in `kwargs`.
-        kwargs = self.__collect__(edge_index, size, mp_type, kwargs)
-
-        # run message & aggregate functions in separation.
-        msg_kwargs = self.__distribute__(self.__msg_params__, kwargs)
+        msg_kwargs = self.inspector.distribute('message', coll_dict)
         msg_out = self.message(**msg_kwargs)
 
-        aggr_kwargs = self.__distribute__(self.__aggr_params__, kwargs)
+        aggr_kwargs = self.inspector.distribute('aggregate', coll_dict)
         out = self.aggregate(msg_out, **aggr_kwargs)
 
-        update_kwargs = self.__distribute__(self.__update_params__, kwargs)
+        update_kwargs = self.inspector.distribute('update', coll_dict)
         out = self.update(out, **update_kwargs)
 
         return out, msg_out
+
 
     def message(self, x_j, similarity): #default is source to target
         '''

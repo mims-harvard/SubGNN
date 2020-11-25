@@ -40,7 +40,6 @@ from torch_geometric.nn import MessagePassing, GINConv
 
 # Similarity calculations
 from fastdtw import fastdtw
-import gmatch4py as gm
 
 # Networkx
 import networkx as nx
