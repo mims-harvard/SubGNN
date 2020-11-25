@@ -157,7 +157,7 @@ def generate_emb():
             log_f.write(str(curr_hyperparameters) + "\n")
 
             # Set up
-            model = mdl.TrainNet(all_data.x.shape[1], curr_hyperparameters['hidden'], curr_hyperparameters['output'], config.CONV.lower().split("_")[0], curr_hyperparameters['dropout']).to(device)
+            model = mdl.TrainNet(all_data.x.shape[1], curr_hyperparameters['hidden'], curr_hyperparameters['output'], config.CONV.lower().split("_")[1], curr_hyperparameters['dropout']).to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr = curr_hyperparameters['lr'], weight_decay = curr_hyperparameters['wd'])
 
             # Train model
