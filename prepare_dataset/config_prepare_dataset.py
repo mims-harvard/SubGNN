@@ -41,7 +41,7 @@ CC_RANGE = [1, 1, 1, 1, 5, 6, 7, 8, 9, 10]
 MAX_TRIES = 100
 
 # Parameters for training node embeddings for base graph
-CONV = "gcn_graphsaint"
+CONV = "graphsaint_gcn" 
 MINIBATCH = "GraphSaint"
 POSSIBLE_BATCH_SIZES = [512, 1024]
 POSSIBLE_HIDDEN = [128, 256]
