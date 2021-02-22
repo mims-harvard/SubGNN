@@ -1,4 +1,4 @@
-name: subGemb_update
+name: subGemb
 channels:
   - pytorch
   - conda-forge
@@ -171,7 +171,7 @@ dependencies:
     - pytest==5.4.2
     - pytest-cov==2.9.0
     - python-editor==1.0.4
-    - python-graphviz==0.14
+    - graphviz==0.14
     - pytorch-crf==0.7.0
     - pytorch-lightning==0.7.1
     - pywavelets==1.1.1
@@ -219,5 +219,5 @@ dependencies:
     - xlrd==1.2.0
     - xlsxwriter==1.2.8
     - zipp==3.1.0
-prefix: /home/emilya/.conda/envs/subGemb_update
+prefix: /home/emilya/.conda/envs/subGemb
 
